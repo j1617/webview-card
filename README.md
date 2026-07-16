@@ -4,7 +4,7 @@
 [![HACS Compatible](https://img.shields.io/badge/HACS-Yes-blue?style=flat-square)](https://hacs.xyz/)
 [![License](https://img.shields.io/github/license/qclaw/webview-card?style=flat-square)](LICENSE)
 
-**版本**: 1.1.0
+**版本**: 1.2.0
 
 在 Home Assistant 中内嵌显示网页或本地 HTML 文件，支持 JavaScript 完美执行。
 
@@ -89,11 +89,14 @@ height: 600px
 
 ## 更新日志
 
+### v1.2.0
+- 🐛 修复 local_file 加载本地 HTML 显示空白的问题
+- ⚡ 移除 Shadow DOM，改用直接 DOM 操作
+
 ### v1.1.0
 - 修复卡片在 HA 中找不到的问题
 - 优化 Shadow DOM 兼容性
 - 新增 `local_file` 参数支持
-- 完善文档
 
 ### v1.0.0
 - 初始版本

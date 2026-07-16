@@ -1,19 +1,21 @@
 /*
- * WebView Card for Home Assistant (简化版)
- * 版本: 1.0.0
- * 直接操作 DOM，不使用 Shadow DOM，兼容性更好
+ * WebView Card for Home Assistant (备选版本)
+ * 版本: 1.1.0
+ * 支持加载远程网页或本地 HTML 文件，支持 JavaScript 执行
+ * 使用直接 DOM 操作，兼容性更好
  */
 
 (function () {
   "use strict";
 
-  const VERSION = "1.1.0";
+  const VERSION = "1.2.0";
 
   class WebViewCard extends HTMLElement {
     set hass(hass) {
       this._hass = hass;
-      if (!this._iframe) {
+      if (!this._built) {
         this._build();
+        this._built = true;
       }
     }
 
@@ -27,12 +29,12 @@
       }
 
       // 创建 iframe
-      this._iframe = document.createElement("iframe");
-      this._iframe.id = "webview-iframe";
-      this._iframe.setAttribute("allow", "fullscreen");
+      const iframe = document.createElement("iframe");
+      iframe.id = "webview-iframe";
+      iframe.setAttribute("allow", "fullscreen");
 
       const height = config.height || "400px";
-      this._iframe.style.cssText = `
+      iframe.style.cssText = `
         width: 100%;
         height: ${height};
         border: none;
@@ -41,13 +43,48 @@
       `;
 
       // 设置 sandbox
-      iframe_sandbox(this._iframe, config);
+      iframe.sandbox.add("allow-same-origin");
+      if (config.allow_js !== false) {
+        iframe.sandbox.add("allow-scripts");
+      }
+      if (config.allow_popups) {
+        iframe.sandbox.add("allow-popups");
+        iframe.sandbox.add("allow-top-navigation");
+      }
 
       // 设置 src
-      iframe_src(this._iframe, config, this._hass);
+      let src = "";
+      if (config.local_file) {
+        src = config.local_file;
+        // 确保本地文件路径正确
+        if (!src.startsWith("/") && !src.startsWith("http") && !src.startsWith("file://")) {
+          src = "/local/" + src;
+        }
+      } else if (config.url) {
+        src = config.url;
+      } else if (config.entity) {
+        const state = this._hass?.states?.[config.entity];
+        if (state) {
+          src = state.state;
+        }
+      }
 
-      card.appendChild(this._iframe);
+      // 变量替换
+      if (src && this._hass) {
+        src = src.replace(/\{\{(\w+)\}\}/g, (_, entityId) => {
+          const state = this._hass!.states[entityId];
+          return state ? state.state : _;
+        });
+      }
+
+      if (src) {
+        iframe.src = src;
+      }
+
+      card.appendChild(iframe);
       this.appendChild(card);
+      this._card = card;
+      this._iframe = iframe;
     }
 
     setConfig(config) {
@@ -66,53 +103,15 @@
       const h = this._config?.height || "400px";
       return Math.ceil(parseInt(h) / 50) + 1;
     }
-  }
 
-  function iframe_sandbox(iframe, config) {
-    iframe.sandbox.add("allow-same-origin");
-    if (config.allow_js !== false) {
-      iframe.sandbox.add("allow-scripts");
-    }
-    if (config.allow_popups) {
-      iframe.sandbox.add("allow-popups");
-      iframe.sandbox.add("allow-top-navigation");
+    static getStubArea() {
+      return { height: 3 };
     }
   }
 
-  function iframe_src(iframe, config, hass) {
-    let src = "";
-
-    if (config.local_file) {
-      src = config.local_file;
-      if (!src.startsWith("/") && !src.startsWith("http")) {
-        src = "/local/" + src;
-      }
-    } else if (config.url) {
-      src = config.url;
-    } else if (config.entity) {
-      const state = hass?.states?.[config.entity];
-      if (state) {
-        src = state.state;
-      }
-    }
-
-    // 变量替换
-    if (src && hass) {
-      src = src.replace(/\{\{(\w+)\}\}/g, (_, entityId) => {
-        const state = hass.states[entityId];
-        return state ? state.state : _;
-      });
-    }
-
-    if (src) {
-      iframe.src = src;
-    }
-  }
-
-  // 注册组件
   customElements.define("webview-card", WebViewCard);
 
-  // 注册卡片信息
+  // 注册卡片
   window.customCards = window.customCards || [];
   window.customCards.push({
     type: "webview-card",
@@ -123,5 +122,5 @@
     version: VERSION,
   });
 
-  console.log("WebView Card v" + VERSION + " 已加载");
+  console.log("WebView Card v" + VERSION + " loaded (legacy)");
 })();
