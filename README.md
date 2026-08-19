@@ -4,7 +4,7 @@
 [![HACS Compatible](https://img.shields.io/badge/HACS-Yes-blue?style=flat-square)](https://hacs.xyz/)
 [![License](https://img.shields.io/github/license/qclaw/webview-card?style=flat-square)](LICENSE)
 
-**版本**: 1.2.0
+**版本**: 1.3.3
 
 在 Home Assistant 中内嵌显示网页或本地 HTML 文件，支持 JavaScript 完美执行。
 
@@ -88,6 +88,22 @@ height: 600px
 ---
 
 ## 更新日志
+
+### v1.3.3
+- 版本号更新
+
+### v1.3.2
+- 🐛 修复 `Unexpected token '!'` 语法错误
+- 🔧 移除不兼容的 `!` 运算符写法
+- 🔧 使用 ES5 兼容语法
+
+### v1.3.1
+- 🐛 修复 `Custom element doesn't exist` 错误
+- 🔧 添加 constructor 初始化
+
+### v1.3.0
+- 🐛 尝试修复 `Custom element doesn't exist` 错误
+- ⚡ 移除 IIFE 包装
 
 ### v1.2.0
 - 🐛 修复 local_file 加载本地 HTML 显示空白的问题

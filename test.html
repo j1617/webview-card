@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebView Card Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .test-item {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+    .test-item h3 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+    .success {
+      background: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .counter {
+      font-size: 48px;
+      text-align: center;
+      color: #764ba2;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .clock {
+      font-size: 36px;
+      text-align: center;
+      color: #333;
+      font-family: monospace;
+    }
+    .info {
+      background: #fff3cd;
+      color: #856404;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎉 WebView Card 测试页面</h1>
+    
+    <div class="test-item">
+      <h3>✅ 测试 1: 页面加载成功</h3>
+      <p style="color: #666;">如果看到这个页面，说明 HTML 文件加载正常！</p>
+    </div>
+    
+    <div class="test-item">
+      <h3>🧮 测试 2: JavaScript 交互</h3>
+      <div class="counter" id="counter">0</div>
+      <button class="btn" onclick="increment()">点击 +1</button>
+    </div>
+    
+    <div class="test-item">
+      <h3>🕐 测试 3: 实时时钟</h3>
+      <div class="clock" id="clock">--:--:--</div>
+    </div>
+    
+    <div class="success" id="success">
+      ✅ 所有测试通过！WebView Card 工作正常！
+    </div>
+    
+    <div class="info">
+      <strong>提示：</strong>如果这个页面正常显示，说明卡片配置正确。
+      如果显示空白，请检查文件路径是否正确。
+    </div>
+  </div>
+
+  <script>
+    // 计数器测试
+    let count = 0;
+    function increment() {
+      count++;
+      document.getElementById('counter').textContent = count;
+    }
+    
+    // 时钟测试
+    function updateClock() {
+      const now = new Date();
+      const time = now.toLocaleTimeString('zh-CN');
+      document.getElementById('clock').textContent = time;
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // 通知父窗口加载完成
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'webview-loaded', success: true }, '*');
+    }
+  </script>
+</body>
+</html>
